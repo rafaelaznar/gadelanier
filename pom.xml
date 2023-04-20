@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.ausiasmarch</groupId>
-    <artifactId>anapracis</artifactId>
+    <artifactId>gadelanier</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>anapracis</name>
+    <name>gadelanier</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>

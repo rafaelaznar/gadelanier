@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>anapracis</title>
+        <title>gadelanier</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -13,11 +13,12 @@
             <div class="row justify-content-center">
                 <div class="p-5 mb-4 bg-light rounded-3">
                     <div class="text-center">
-                        <h1 class="display-4 fw-bold mb-4">anapracis</h1>
+                        <h1 class="display-4 fw-bold mb-4">gadelanier</h1>
                         <h6 class="text-muted text-monospace">Cuadrante de multiplicaciones dinámico AJAX</h6>
                         <h6 class="text-muted text-monospace">Procesamiento en entorno servidor con servlet y gson</h6>
                         <h6 class="text-muted text-monospace">Respuesta json celda a celda con delay opcional</h6>
                         <h6 class="text-muted text-monospace">Con formulario generador de tabla. Petición AJAX con jQuery.</h6>
+                        <h6 class="text-muted text-monospace">Detección de finalización de proceso mediante promesas.</h6>
                     </div>
                 </div>
             </div>
@@ -32,24 +33,27 @@
                             <label for="alto">Alto: </label>
                             <input type="text"  id="alto" name="alto" value="10" class="form-control" placeholder="Introduce un número del 1 al 30" />
                         </div>
-                        <input class="btn btn-primary mt-4" type="submit" value="Enviar sin delay" name="submit" id="enviar1" />
-                        <input class="btn btn-primary mt-4" type="submit" value="Enviar con delay" name="submit" id="enviar2" />
+                        <input class="btn btn-primary mt-4" type="submit" value="Enviar (respuesta con delay de servidor)" name="submit" id="enviar" />
                         <input class="btn btn-danger mt-4" type="submit" value="Borrar" name="submit" id="borrar" />
                     </form>
                 </div>
             </div>
-            <div class="row justify-content-center" id="tabla">
+            <div class="row justify-content-center text-center mt-4" id="mensaje">
+            </div>
+            <div class="row justify-content-center text-center" id="tabla">
             </div>
         </div>
         <script type="text/javascript">
             $(document).ready(function () {
-                $("#enviar1").click(function () {
+                $("#enviar").click(function () {
+                    $("#mensaje").empty();
                     $("#tabla").empty();
+                    var deferreds = [];
                     var tabla = '<table class="table table-bordered table-success table-striped mx-auto mt-5">';
                     for (var i = 1; i <= 10; i++) {
                         tabla += "<tr>"
                         for (var j = 1; j <= 10; j++) {
-                            tabla += '<td class="text-center">';
+                            tabla += '<td>';
                             tabla += '<div class="spinner-border spinner-border-sm" role="status" id="' + i + "x" + j + '"></div>';
                             tabla += "</td>\n";
                         }
@@ -59,58 +63,30 @@
                     $('#tabla').html(tabla);
                     for (i = 1; i <= 10; i++) {
                         for (j = 1; j <= 10; j++) {
-                            (function (i, j) {
-                                $.ajax({
-                                    url: "control?op1=" + i + "&op2=" + j,
-                                    type: "GET",
-                                    dataType: "json",
-                                    success: function (source) {
-                                        $("#" + i + 'x' + j).removeClass("spinner-border spinner-border-sm");
-                                        //$("#" + i + 'x' + j).html(source.result);
-                                        document.getElementById(i + 'x' + j).innerHTML = source.result;
-                                    }
-                                });
-                            })(i, j);
+                            deferreds.push(ajaxCall(i, j));
                         }
                     }
-                    return false;
-                });
-                $("#enviar2").click(function () {
-                    $("#tabla").empty();
-                    var tabla = '<table class="table table-bordered table-success table-striped mx-auto mt-5">';
-                    for (var i = 1; i <= 10; i++) {
-                        tabla += "<tr>"
-                        for (var j = 1; j <= 10; j++) {
-                            tabla += '<td class="text-center">';
-                            tabla += '<div class="spinner-border spinner-border-sm" role="status" id="' + i + "x" + j + '"></div>';
-                            tabla += "</td>\n";
-                        }
-                        tabla += "</tr>";
-                    }
-                    tabla += "</table>";
-                    $('#tabla').html(tabla);
-                    for (i = 1; i <= 10; i++) {
-                        for (j = 1; j <= 10; j++) {
-                            (function (i, j) {
-                                $.ajax({
-                                    url: "control?op1=" + i + "&op2=" + j + "&maxdelay=" + (3000),
-                                    type: "GET",
-                                    dataType: "json",
-                                    success: function (source) {
-                                        $("#" + i + 'x' + j).removeClass("spinner-border spinner-border-sm");
-                                        //$("#" + i + 'x' + j).html(source.result);
-                                        document.getElementById(i + 'x' + j).innerHTML = source.result;
-                                    }
-                                });
-                            })(i, j);
-                        }
-                    }
+                    $.when.apply($, deferreds).then(function () {
+                        $("#mensaje").html("<h1>Tabla completa!<h1>")
+                    });
                     return false;
                 });
                 $("#borrar").click(function () {
                     $("#tabla").empty();
+                    $("#mensaje").empty();
                     return false;
                 });
+                function ajaxCall(i, j) {
+                    return $.ajax({
+                        url: "control?op1=" + i + "&op2=" + j + "&maxdelay=" + (3000),
+                        type: "GET",
+                        dataType: "json",
+                        success: function (source) {
+                            $("#" + i + 'x' + j).removeClass("spinner-border spinner-border-sm");
+                            document.getElementById(i + 'x' + j).innerHTML = source.result;
+                        }
+                    })
+                }
             });
         </script>
     </body>

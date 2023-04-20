@@ -1,4 +1,4 @@
-package net.ausiasmarch.sorivio;
+package net.ausiasmarch.gadelanier;
 
 import com.google.gson.Gson;
 import java.io.IOException;

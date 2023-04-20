@@ -1,4 +1,4 @@
-package net.ausiasmarch.sorivio;
+package net.ausiasmarch.gadelanier;
 
 public class MultiplicationBean {
 
